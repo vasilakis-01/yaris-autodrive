@@ -1,4 +1,6 @@
 #include <iostream>
+#include <string>
+#include <cstdlib>
 
 using namespace std;
 unsigned int seed;   //global(ebgaze themata alliws)
@@ -9,7 +11,7 @@ class Gridworld{
     public:
         Gridworld(int wid,int h);
         int getWidth
-}
+};
 
 struct defaults{
     unsigned int seed;
@@ -27,6 +29,7 @@ struct defaults{
     int destX;
     int destY;
 };
+
 void printHelp(){
         cout << "Self-Driving Car Simulation" << endl;
         cout << "Usage: " << endl;
@@ -46,53 +49,55 @@ void printHelp(){
         cout << "  ./oopproj_2025 --seed 12 --dimY 50 --gps 10 20 32 15" << endl;
     }
 
-void parseArguments(int argc,char *argv[]){
+void parseArguments(int argc,char *argv[], defaults& d){
      for (int i = 1; i < argc; i++) {
         string arg = argv[i];
         if (arg == "--help") {
             printHelp();
-            return 0;
+            return;
         }
         else if (arg == "--seed") {
-            seed = stoul(argv[++i]);
+            d.seed = stoul(argv[++i]);
         }
         else if (arg == "--dimX") {
-            dimX = stoi(argv[++i]);
+            d.dimX = stoi(argv[++i]);
         }
         else if (arg == "--dimY") {
-            dimY = stoi(argv[++i]);
+            d.dimY = stoi(argv[++i]);
         }
         else if (arg == "--numMovingCars"){
-            numMovingCars = stoi(argv[++i]);
+            d.numMovingCars = stoi(argv[++i]);
         }
         else if (arg == "--numMovingBikes"){
-            numMovingBikes = stoi(argv[++i]);
+            d.numMovingBikes = stoi(argv[++i]);
         }
         else if (arg == "--numParkedCars"){
-            numParkedCars = stoi(argv[++i]);
+            d.numParkedCars = stoi(argv[++i]);
         }
         else if (arg == "--numStopSigns"){
-            numStopSigns = stoi(argv[++i]);
+            d.numStopSigns = stoi(argv[++i]);
         }
         else if (arg == "--numTrafficLights"){
-            numTrafficLights = stoi(argv[++i]);
+            d.numTrafficLights = stoi(argv[++i]);
         }
         else if (arg == "--simulationTicks"){
-            simulationTicks = stoi(argv[++i]);
+            d.simulationTicks = stoi(argv[++i]);
         }
         else if (arg == "--minConfidenceThreshold"){
-            minConfidenceThreshold = stoi(argv[++i]);
+            d.minConfidenceThreshold = stoi(argv[++i]);
         }
         else if (arg == "--gps"){
-            startingX = stoi(argv[i+1]);
-            startingY = stoi(argv[i+2]);
-            destX= stoi(argv[i+3]);
-            destY= stoi(argv[i+4]);
+            d.startingX = stoi(argv[i+1]);
+            d.startingY = stoi(argv[i+2]);
+            d.destX= stoi(argv[i+3]);
+            d.destY= stoi(argv[i+4]);
+            break;
         }
 }
 }
 
 int main(int argc, char* argv[]){
-    parseArguments(argc,argv);
+    defaults config;
+    parseArguments( argc, argv, config);
     return 0;
 }
