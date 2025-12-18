@@ -5,6 +5,8 @@
 #include <random>
 #include <string>
 #include <cmath>
+#include <cstdlib>
+#include <ctime>
 
 //position class
 class Position {
@@ -52,27 +54,25 @@ public:
     }
 };
 
-//random class
 class Random {
-private:
-    std::mt19937 generator;
-    
-public:
-//seed setters (might change later)
-    Random(int seed = -1) {
-        if (seed == -1) {
-            std::random_device rd;
-            generator.seed(rd());
-        } else {
-            generator.seed(seed);
+    public:
+        Random(int seed = -1) {
+            if (seed == -1) {
+            //set the deafault seed if one is not provided
+            srand(time(NULL));
+            } else {
+            //set the given seed
+            srand(seed);
         }
-    }
-    //func to get the random number
-    int getInt(int min, int max) {
-        std::uniform_int_distribution<int> dist(min, max);
-        return dist(generator);
+        }
+    
+        //function to get random number from min to max
+        int getInt(int min, int max) {
+            // rand() % (max - min + 1) + min
+            return rand() % (max - min + 1) + min;
     }
 };
+
 
 //direction class
 enum class Direction {
@@ -103,6 +103,11 @@ Position directionToVector(Direction dir) {
         case Direction::WEST:  return Position(-1, 0);
         default: return Position(0, 0);
     }
+}
+
+Direction randomDirection(Random& rng) {
+    int dir = rng.getInt(0, 3);  // 0, 1, 2, 3
+    return static_cast<Direction>(dir);
 }
 
 
