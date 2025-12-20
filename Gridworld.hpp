@@ -1,135 +1,132 @@
+#ifndef GRIDWORLD_HPP
+#define GRIDWORLD_HPP
+
+#include <vector>
 #include <iostream>
-#include <string>
-#include <cstdlib>
-#include <ctime>
+#include "Utilities.hpp"
+#include "WorldObject.hpp"
 
-using namespace std;
 
-struct defaults {
-    unsigned int seed = time(nullptr);
-    int dimX = 40;
-    int dimY = 40;
-    int numMovingCars = 3;
-    int numMovingBikes = 4;
-    int numParkedCars = 5;
-    int numStopSigns = 2;
-    int numTrafficLights = 2;
-    int simulationTicks = 100;
-    int minConfidenceThreshold = 40;
-    int startingX;
-    int startingY;
-    int destX;
-    int destY;
-};
-
-class Gridworld {
+//gridworld class
+class GridWorld {
 private:
-    int width;
-    int height;
-    int currentTick;
-
+    int width, height; //world's size
+    std::vector<std::vector<WorldObject*>> grid; //vector that consists of pointers tha point to all the objects in the world
+    
 public:
-    Gridworld(int w, int h)
-        : width(w), height(h), currentTick(0) {
-        cout << "[+WORLD] Initialized " << width << "x" << height << endl;
+    //contructor
+    GridWorld(int w = 40, int h = 40) : width(w), height(h) {
+        grid.resize(height); //world resize according to the inputs given from the user
+        for (int y = 0; y < height; y++) {
+            grid[y].resize(width, nullptr);
+        }
     }
+    
+    //destructor
+    ~GridWorld() {
+        clear();
+    }
+    
+    //during destruction of the world set all the object pointers to null to avoid memory leaks
+    void clear() {
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                if (grid[y][x] != nullptr) {
+                    delete grid[y][x]; //memory deallocation
+                    grid[y][x] = nullptr; // set pointer->NULL
+                }
+            }
+        }
+    }
+    
+    //function to add an object in the world
+    bool addObject(WorldObject* obj) {
 
-    int getWidth() const {
-        return width;
+        Position pos = obj->getPosition(); //get objects position
+        
+        //check if its in bounds
+        if (pos.getX() < 0 || pos.getX() >= width || 
+            pos.getY() < 0 || pos.getY() >= height) {
+            return false;
+        }
+        
+        //initiate it in the world
+        grid[pos.getY()][pos.getX()] = obj;
+        return true;
     }
-
-    int getHeight() const {
-        return height;
+    
+    //function to update the world according to the ticks
+    void update(int tick) {
+        
+        //create a vector of pointers that point to objects that changed position
+        std::vector<std::pair<WorldObject*, Position>> movedObjects;
+        
+        //update all objects according to their type (the specific update function of each object will operate)
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                //run through the world and update each object
+                WorldObject* obj = grid[y][x];
+                if (obj != nullptr) {
+                    Position oldPos = obj->getPosition();
+                    obj->update(tick);
+                    Position newPos = obj->getPosition();
+                    
+                    //if it was a moving object and it changed position store it to the moved object vector
+                    if (oldPos.getX() != newPos.getX() || oldPos.getY() != newPos.getY()) {
+                        movedObjects.push_back({obj, oldPos});
+                    }
+                }
+            }
+        }
+        
+        //do the movement of the object
+        for (auto& pair : movedObjects) {
+            WorldObject* obj = pair.first;
+            Position oldPos = pair.second;
+            Position newPos = obj->getPosition();
+            
+            //clear old position
+            if (grid[oldPos.getY()][oldPos.getX()] == obj) {
+                grid[oldPos.getY()][oldPos.getX()] = nullptr;
+            }
+            
+            //add the object to its new posiiton and check if the position is valid
+            if (newPos.getX() >= 0 && newPos.getX() < width &&
+                newPos.getY() >= 0 && newPos.getY() < height) {
+                grid[newPos.getY()][newPos.getX()] = obj;
+            } else {
+                //if the new position isnt valid the object went out of bound and is deleted
+                delete obj;
+            }
+        }
     }
-
-    bool isInside(int x, int y) const {
-        return x >= 0 && x < width && y >= 0 && y < height;
+    
+    //function to visualize the world
+    void show() {
+        std::cout << "\nGrid World (" << width << "x" << height << "):\n";
+        
+        for (int y = height - 1; y >= 0; y--) {
+            std::cout << "Row " << y << ": ";
+            for (int x = 0; x < width; x++) {
+                if (grid[y][x] == nullptr) {
+                    std::cout << ". ";
+                } else {
+                    std::cout << grid[y][x]->getGlyph() << " ";
+                }
+            }
+            std::cout << std::endl;
+        }
     }
-
-    void update() {
-        currentTick++;
-        cout << "[WORLD] Tick: " << currentTick << endl;
+    
+    //getters
+    WorldObject* getObjectAt(int x, int y) {
+        if (x >= 0 && x < width && y >= 0 && y < height) {
+            return grid[y][x];
+        }
+        return nullptr;
     }
+    int getWidth() const { return width; }
+    int getHeight() const { return height; }
 };
 
-void printHelp() {
-    cout << "Self-Driving Car Simulation" << endl;
-    cout << "Usage: " << endl;
-    cout << "  --seed <n>                 Random seed (default: current time)" << endl;
-    cout << "  --dimX <n>                 World width (default: 40)" << endl;
-    cout << "  --dimY <n>                 World height (default: 40)" << endl;
-    cout << "  --numMovingCars <n>        Number of moving cars (default: 3)" << endl;
-    cout << "  --numMovingBikes <n>       Number of moving bikes (default: 4)" << endl;
-    cout << "  --numParkedCars <n>        Number of parked cars (default: 5)" << endl;
-    cout << "  --numStopSigns <n>         Number of stop signs (default: 2)" << endl;
-    cout << "  --numTrafficLights <n>     Number of traffic lights (default: 2)" << endl;
-    cout << "  --simulationTicks <n>      Maximum simulation ticks (default: 100)" << endl;
-    cout << "  --minConfidenceThreshold <n> Minimum confidence cutoff (default: 40)" << endl;
-    cout << "  --gps <x1> <y1> <x2> <y2>  GPS target coordinates (required)" << endl;
-    cout << "  --help                     Show this help message" << endl << endl;
-    cout << "Example usage: " << endl;
-    cout << "  ./oopproj_2025 --seed 12 --dimY 50 --gps 10 20 32 15" << endl;
-}
-
-void parseArguments(int argc, char* argv[], defaults& d) {
-    for (int i = 1; i < argc; i++) {
-        string arg = argv[i];
-
-        if (arg == "--help") {
-            printHelp();
-            exit(0);
-        }
-        else if (arg == "--seed") {
-            d.seed = stoul(argv[++i]);
-        }
-        else if (arg == "--dimX") {
-            d.dimX = stoi(argv[++i]);
-        }
-        else if (arg == "--dimY") {
-            d.dimY = stoi(argv[++i]);
-        }
-        else if (arg == "--numMovingCars") {
-            d.numMovingCars = stoi(argv[++i]);
-        }
-        else if (arg == "--numMovingBikes") {
-            d.numMovingBikes = stoi(argv[++i]);
-        }
-        else if (arg == "--numParkedCars") {
-            d.numParkedCars = stoi(argv[++i]);
-        }
-        else if (arg == "--numStopSigns") {
-            d.numStopSigns = stoi(argv[++i]);
-        }
-        else if (arg == "--numTrafficLights") {
-            d.numTrafficLights = stoi(argv[++i]);
-        }
-        else if (arg == "--simulationTicks") {
-            d.simulationTicks = stoi(argv[++i]);
-        }
-        else if (arg == "--minConfidenceThreshold") {
-            d.minConfidenceThreshold = stoi(argv[++i]);
-        }
-        else if (arg == "--gps") {
-            d.startingX = stoi(argv[++i]);
-            d.startingY = stoi(argv[++i]);
-            d.destX     = stoi(argv[++i]);
-            d.destY     = stoi(argv[++i]);
-            break;
-        }
-    }
-}
-
-int main(int argc, char* argv[]) {
-    defaults config;
-    parseArguments(argc, argv, config);
-
-    srand(config.seed);
-
-    Gridworld world(config.dimX, config.dimY);
-
-    for (int i = 0; i < config.simulationTicks; i++) {
-        world.update();
-    }
-
-    return 0;
-}
+#endif // GRIDWORLD_HPP

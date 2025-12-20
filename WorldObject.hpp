@@ -24,7 +24,9 @@ public:
     
     //destructor
     virtual ~WorldObject() {}
-    
+
+    //update fucntion will differenciate in the objects
+    virtual void update(int tick) = 0;
     
     
     //is static object check
@@ -44,4 +46,4 @@ public:
     void setGlyph(char newGlyph) { glyph = newGlyph; }
 };
 
-#endif // WORLDOBJECT_HPP
+#endif

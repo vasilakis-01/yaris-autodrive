@@ -1,20 +1,20 @@
 #ifndef MOVSTATOBJECT_HPP
 #define MOVSTATOBJECT_HPP
 
-#include <WorldObject.hpp>
+#include "WorldObject.hpp"
 
 //static object funtion
 class StaticObject : public WorldObject{
     public:
-        StaticObject(std::string type, char glyph , Position pos) : WorldObject(type,glyph,pos) {}
+        StaticObject(std::string type, char glyph, Position pos) : WorldObject(type, glyph, pos) {}
         
-        bool isStatick() const {return true;}
-        bool isMoving() const  {return false;}
-        void update(int tick) {
-            //its statick doesnt move
+        bool isStatic() const override {return true;}
+        bool isMoving() const override {return false;}
+        void update(int tick) override {
+            (void)tick;
         }
-
 };
+
 //moving object class
 class MovingObject : public WorldObject{
     protected: 
@@ -23,15 +23,16 @@ class MovingObject : public WorldObject{
         int speed;
     
     public:
-        MovingObject(std::string  type, char glyph, Position pos, Direction dir, int s) : WorldObject(type,glyph,pos),direction(dir), speed(s) {}
+        MovingObject(std::string type, char glyph, Position pos, Direction dir, int s) 
+            : WorldObject(type, glyph, pos), direction(dir), speed(s) {}
 
         //move to each dir function
-        void update(int tick) {
+        void update(int tick) override {  // ΠΡΟΣΘΗΚΗ: override
             Position movePos = directionToVector(direction);
-            //calculate new position and set it after movement
-            int newX = position.getX() + movePos.getX()*speed;
-            int newY = position.getY() + movePos.getY()*speed;
-            position = Position(newX,newY);
+            int newX = position.getX() + movePos.getX() * speed;
+            int newY = position.getY() + movePos.getY() * speed;
+            position = Position(newX, newY);
+            (void)tick;
         }
 
         bool isStatic() const override { return false; }
@@ -44,7 +45,6 @@ class MovingObject : public WorldObject{
         //setters
         void setDirection(Direction newDir) { direction = newDir; }
         void setSpeed(int newSpeed) { speed = newSpeed; }
-
 };
 
-#endif 
+#endif

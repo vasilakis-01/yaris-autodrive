@@ -1,22 +1,28 @@
 #ifndef MOVINGOBJECTS_HPP
 #define MOVINGOBJECTS_HPP
 
-#include <MovStatObject.hpp>
+#include "MovStatObject.hpp"
 
 class MovingCar : public MovingObject{
     public:
-        MovingCar(Position pos,Random &range) : MovingObject("Moving_Car",'C',pos,range,1){}
-        ~Moving_Car(){}
+        MovingCar(Position pos, Random &rng) : MovingObject("CAR", 'C', pos, randomDirection(rng), 1){}
+        ~MovingCar(){}
+
+        void update(int tick) override {
+            MovingObject::update(tick);
+            (void)tick;
+        }
 };
 
 class MovingBike : public MovingObject{
     public:
-        MovingBike(Position pos, Random &range) : MovingObject("Moving_Bike",'B',pos,range,1){}
+        MovingBike(Position pos, Random &rng) : MovingObject("BIKE", 'B', pos, randomDirection(rng), 1){}
         ~MovingBike(){}
+
+        void update(int tick) override {
+            MovingObject::update(tick);
+            (void)tick;
+        }
 };
-
-
-
-
 
 #endif

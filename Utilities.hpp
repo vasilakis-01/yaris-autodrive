@@ -7,6 +7,7 @@
 #include <cmath>
 #include <cstdlib>
 #include <ctime>
+#include <vector>
 
 //position class
 class Position {
@@ -110,5 +111,38 @@ Direction randomDirection(Random& rng) {
     return static_cast<Direction>(dir);
 }
 
+//function to get a unique random position
+Position getRandomPosition(Random& rng, int maxX, int maxY, const std::vector<Position>& occupied) {
+    Position pos;
+    bool isUnique;
+    int attempts = 0;
+    const int MAX_ATTEMPTS = maxX * maxY * 2; //max attempts will be double the size of the world for safety
+    
+    do {
+        isUnique = true;
+        //use the getInt function to aquire random coordinates
+        int x = rng.getInt(0, maxX - 1);
+        int y = rng.getInt(0, maxY - 1);
+        pos = Position(x, y);
+        
+        //check if the position taken is already occupied
+        for (const auto& occ : occupied) {
+            if (pos == occ) {
+                isUnique = false;
+                break;
+            }
+        }
+        
+        attempts++;
+        //if the number of possible attempts is exceeded return the last unique position 
+        if (attempts > MAX_ATTEMPTS) {
+            std::cerr << "Warning: Could not find unique position after " 
+                 << MAX_ATTEMPTS << " attempts. Using position anyway." << std::endl;
+            return pos;
+        }
+    } while (!isUnique);
+    
+    return pos;
+}
 
-#endif // UTILITIES_HPP
+#endif
