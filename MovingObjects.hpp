@@ -1,3 +1,4 @@
+/*MovingObjects.hpp*/
 #ifndef MOVINGOBJECTS_HPP
 #define MOVINGOBJECTS_HPP
 

@@ -1,3 +1,6 @@
+/*Utilities.hpp*/
+//this file contains basic classes like Position and Direction classes and other useful classes and functions
+//that are used in basically all other files
 #ifndef UTILITIES_HPP
 #define UTILITIES_HPP
 

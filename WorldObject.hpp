@@ -1,3 +1,4 @@
+/*WorldObject.hpp*/
 #ifndef WORLDOBJECT_HPP
 #define WORLDOBJECT_HPP
 
@@ -22,7 +23,7 @@ public:
         id = type + std::to_string(counter++);
     }
     
-    //destructor
+    //virtual destructor
     virtual ~WorldObject() {}
 
     //update fucntion will differenciate in the objects

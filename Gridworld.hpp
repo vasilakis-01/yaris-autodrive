@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <iostream>
+#include <iomanip>
 #include "Utilities.hpp"
 #include "WorldObject.hpp"
 
@@ -38,6 +39,11 @@ public:
             }
         }
     }
+
+    //function to check if a specific poition is in bounds of the world
+    bool isInside(Position pos) {
+        return (pos.getX() >= 0 && pos.getX() < width && pos.getY() >= 0 && pos.getY() < height);
+    }
     
     //function to add an object in the world
     bool addObject(WorldObject* obj) {
@@ -67,6 +73,8 @@ public:
                 //run through the world and update each object
                 WorldObject* obj = grid[y][x];
                 if (obj != nullptr) {
+                    if (obj->getGlyph() == '@') continue;
+
                     Position oldPos = obj->getPosition();
                     obj->update(tick);
                     Position newPos = obj->getPosition();
@@ -101,12 +109,12 @@ public:
         }
     }
     
-    //function to visualize the world
-    void show() {
-        std::cout << "\nGrid World (" << width << "x" << height << "):\n";
+    //functions to visualize the world
+    //FULL VISUALIZATION
+    void visualization_full() const {
+        std::cout << "\n=== FULL WORLD (" << width << "x" << height << ") ===\n";
         
         for (int y = height - 1; y >= 0; y--) {
-            std::cout << "Row " << y << ": ";
             for (int x = 0; x < width; x++) {
                 if (grid[y][x] == nullptr) {
                     std::cout << ". ";
@@ -114,8 +122,86 @@ public:
                     std::cout << grid[y][x]->getGlyph() << " ";
                 }
             }
-            std::cout << std::endl;
+            std::cout << "\n";
         }
+        
+        std::cout << "=============================\n";
+    }
+    
+    //POV VISUALIZATION
+    void visualization_pov(const Position& vehiclePos, int radius = 3, bool centered = true) const {
+        int carX = vehiclePos.getX();
+        int carY = vehiclePos.getY();
+        
+        std::cout << "\n=== POV VIEW ===\n";
+        std::cout << "Car: @ at (" << carX << "," << carY << ")\n";
+        
+        if (centered) {
+            //if the car is centered for the pov
+            for (int y = carY + radius; y >= carY - radius; y--) {
+                for (int x = carX - radius; x <= carX + radius; x++) {
+                    if (x == carX && y == carY) {
+                        std::cout << "@ ";  // Το όχημα
+                    } else if (x >= 0 && x < width && y >= 0 && y < height) {
+                        if (grid[y][x] == nullptr) {
+                            std::cout << ". ";
+                        } else {
+                            std::cout << grid[y][x]->getGlyph() << " ";
+                        }
+                    } else {
+                        std::cout << "Χ "; 
+                    }
+                }
+                std::cout << "\n";
+            }
+        } else {
+            //front view pov
+            for (int y = carY + radius; y >= carY; y--) {
+                for (int x = carX - radius; x <= carX + radius; x++) {
+                    if (x == carX && y == carY) {
+                        std::cout << "@ ";
+                    } else if (x >= 0 && x < width && y >= 0 && y < height) {
+                        if (grid[y][x] == nullptr) {
+                            std::cout << ". ";
+                        } else {
+                            std::cout << grid[y][x]->getGlyph() << " ";
+                        }
+                    } else {
+                        std::cout << "X ";
+                    }
+                }
+                std::cout << "\n";
+            }
+        }
+        
+        std::cout << "===============\n";
+    }
+    
+    //simple show world function
+    void show() const{
+        visualization_full();
+    }
+
+    bool moveObjectTo(WorldObject* obj, const Position& newPos) {
+        Position oldPos = obj->getPosition();
+    
+        //check if new pos is in bounds
+        if (newPos.getX() < 0 || newPos.getX() >= width || 
+            newPos.getY() < 0 || newPos.getY() >= height) {
+            return false;
+        }
+    
+        //check if new pos is available
+        if (grid[newPos.getY()][newPos.getX()] != nullptr) {
+            return false;
+        }
+    
+        //Movement
+        grid[oldPos.getY()][oldPos.getX()] = nullptr;  //clear old position
+        grid[newPos.getY()][newPos.getX()] = obj;      //place the object to the new pos
+        obj->setPosition(newPos);                      //update object
+    
+        return true;
     }
     
     //getters
@@ -125,8 +211,25 @@ public:
         }
         return nullptr;
     }
+
+    WorldObject* getObjectAt(const Position& pos) {
+        return getObjectAt(pos.getX(), pos.getY());
+    }
+    
     int getWidth() const { return width; }
     int getHeight() const { return height; }
+
+    void clearCarPointer(WorldObject* car) {
+    //set null the pointer to the car
+    for (int y = 0; y < height; y++) {
+        for (int x = 0; x < width; x++) {
+            if (grid[y][x] == car) {
+                grid[y][x] = nullptr;
+                return;
+            }
+        }
+    }
+}
 };
 
-#endif // GRIDWORLD_HPP
+#endif

@@ -1,3 +1,4 @@
+/*MovStatObject.hpp*/
 #ifndef MOVSTATOBJECT_HPP
 #define MOVSTATOBJECT_HPP
 

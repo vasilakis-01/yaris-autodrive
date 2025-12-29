@@ -1,3 +1,4 @@
+/*StaticObjects.hpp*/
 #ifndef STATICKOBJECTS_HPP
 #define STATICKOBJECTS_HPP
 
@@ -15,26 +16,31 @@ class StationaryVehicle : public StaticObject{
         }
 };
 
+//class StreetSign
 class StreetSign : public StaticObject{
     protected:
-        std::string text;
+        std::string text; //text of the sign
     
     public:
+        //constructor
         StreetSign(Position pos, std::string t, char g): StaticObject("SIGN", g, pos), text(t) {}
+        //detructor
         ~StreetSign(){}
-        void update(int tick) override {(void)tick;}
+        void update(int tick) override {(void)tick;} //update function it doesnt move
 
+        //getter
         std::string getText() const {return text;}
 };
 
+//traffic light class
 class TrafficLight : public StaticObject {
     private:
         int state; //0 for red, 1 for green, 2 for yellow
         int counter;
 
     public:
-        TrafficLight(Position pos) : StaticObject("LIGHT", 'R', pos), state(0), counter(0) {}
-        ~TrafficLight() {}
+        TrafficLight(Position pos) : StaticObject("LIGHT", 'R', pos), state(0), counter(0) {} //constructor
+        ~TrafficLight() {} //destructor
 
         //update traffic light's state function
         void update(int tick) override {
@@ -61,6 +67,7 @@ class TrafficLight : public StaticObject {
         bool isGreen() const {return state==1;}
         bool isYellow() const {return state==2;}
 
+        //getter
         std::string getColor() const {
             if (isRed()) {
                 return "Red";
