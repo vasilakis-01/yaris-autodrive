@@ -9,7 +9,7 @@ class StationaryVehicle : public StaticObject{
     public:
         //initialize the parked vehicle
         StationaryVehicle(Position pos): StaticObject("PARKED", 'P', pos){}
-        ~StationaryVehicle(){}  // ΔΙΟΡΘΩΣΗ: ~StationaryVehicle() όχι ~StationaryVehivle
+        ~StationaryVehicle(){}  
         void update(int tick) override {
             (void)tick;
             //it doesnt move
