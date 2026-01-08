@@ -140,15 +140,15 @@ class SelfDrivingCar : public MovingObject {
         void addDefaultSensors() {
             //Lidar Sensor
             sensors.push_back(unique_ptr<Sensor>(new LidarSensor(getId() + "_LIDAR")));
-            cout << "[+LDAR:" << sensors.back()->getId() << "] Lidar sensor ready - Sensing with pew pews!" << endl;
+            cout << "[+LDAR:" << sensors.back()->getId() << "] Lidar sensor ready  << endl;
         
             //Radar Sensor
             sensors.push_back(unique_ptr<Sensor>(new RadarSensor(getId() + "_RADAR")));
-            cout << "[+RADAR:" << sensors.back()->getId() << "] Radar sensor ready - I'm a Radio star!" << endl;
+            cout << "[+RADAR:" << sensors.back()->getId() << "] Radar sensor ready << endl;
         
             //Camera Sensor
             sensors.push_back(unique_ptr<Sensor>(new CameraSensor(getId() + "_CAMERA")));
-            cout << "[+CAMERA:" << sensors.back()->getId() << "] Camera sensor ready - Say cheese!" << endl;
+            cout << "[+CAMERA:" << sensors.back()->getId() << "] Camera sensor ready << endl;
         
             cout << "[SYSTEM] Total sensors: " << sensors.size() << endl;
         }
